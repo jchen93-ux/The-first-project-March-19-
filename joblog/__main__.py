@@ -1,7 +1,6 @@
 import argparse
 from datetime import date
-from .commands import cmd_add, cmd_export, cmd_list, cmd_search, cmd_stats, cmd_update
-from .commands import cmd_add, cmd_list, cmd_search, cmd_stats, cmd_update
+from .commands import cmd_add, cmd_delete, cmd_export, cmd_list, cmd_search, cmd_stats, cmd_update
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,6 +23,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_update.add_argument("--status", choices=["applied", "interview", "offer", "rejected"])
     p_update.add_argument("--notes")
     p_update.set_defaults(func=cmd_update)
+
+    p_delete = sub.add_parser("delete", help="Delete an application by id.")
+    p_delete.add_argument("--id", type=int, required=True)
+    p_delete.add_argument("--yes", action="store_true", help="Confirm deletion.")
+    p_delete.set_defaults(func=cmd_delete)
 
     p_stats = sub.add_parser("stats", help="Show status counts.")
     p_stats.set_defaults(func=cmd_stats)

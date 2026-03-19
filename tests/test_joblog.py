@@ -142,3 +142,51 @@ def test_export_creates_csv(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "Exported 1 applications" in out
     assert (tmp_path / "out.csv").exists()
+
+
+def test_delete_requires_yes(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    a1 = type("Args", (), {})()
+    a1.company = "Amazon"
+    a1.role = "SDE"
+    a1.status = "applied"
+    a1.date = "2026-03-19"
+    a1.notes = ""
+    app.cmd_add(a1)
+
+    delete_args = type("Args", (), {})()
+    delete_args.id = 1
+    delete_args.yes = False
+
+    capsys.readouterr()
+    app.cmd_delete(delete_args)
+    out = capsys.readouterr().out.lower()
+    assert "use --yes" in out or "refusing to delete" in out
+
+    data = json.loads(Path("joblog.json").read_text(encoding="utf-8"))
+    assert len(data["items"]) == 1
+
+
+def test_delete_removes_item(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    a1 = type("Args", (), {})()
+    a1.company = "Amazon"
+    a1.role = "SDE"
+    a1.status = "applied"
+    a1.date = "2026-03-19"
+    a1.notes = ""
+    app.cmd_add(a1)
+
+    delete_args = type("Args", (), {})()
+    delete_args.id = 1
+    delete_args.yes = True
+
+    capsys.readouterr()
+    app.cmd_delete(delete_args)
+    out = capsys.readouterr().out.lower()
+    assert "deleted application id=1" in out
+
+    data = json.loads(Path("joblog.json").read_text(encoding="utf-8"))
+    assert len(data["items"]) == 0

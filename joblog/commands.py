@@ -110,3 +110,26 @@ def cmd_search(args: argparse.Namespace) -> None:
 
     for it in results:
         print(f"[{it['id']}] {it['company']} | {it['role']} | {it['status']} | {it['date']}")
+
+
+def cmd_delete(args: argparse.Namespace) -> None:
+    data = load_data()
+    items = data["items"]
+
+    target_idx = None
+    for idx, it in enumerate(items):
+        if it["id"] == args.id:
+            target_idx = idx
+            break
+
+    if target_idx is None:
+        print(f"Application id={args.id} not found.")
+        return
+
+    if not getattr(args, "yes", False):
+        print(f"Refusing to delete application id={args.id}. Use --yes to confirm.")
+        return
+
+    del items[target_idx]
+    save_data(data)
+    print(f"Deleted application id={args.id}")
