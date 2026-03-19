@@ -34,6 +34,30 @@ def cmd_add(args: argparse.Namespace) -> None:
     print(f"Added application id={item['id']} ({item['company']} - {item['role']})")
 
 
+def cmd_update(args: argparse.Namespace) -> None:
+    data = load_data()
+    items = data["items"]
+
+    target = None
+    for it in items:
+        if it["id"] == args.id:
+            target = it
+            break
+
+    if target is None:
+        print(f"Application id={args.id} not found.")
+        return
+
+    if args.status is not None:
+        target["status"] = args.status
+    if args.notes is not None:
+        target["notes"] = args.notes
+
+    save_data(data)
+    print(f"Updated application id={args.id}")
+
+
+
 def cmd_list(_: argparse.Namespace) -> None:
     data = load_data()
     items = data["items"]
@@ -59,6 +83,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="List applications.")
     p_list.set_defaults(func=cmd_list)
+
+    p_update = sub.add_parser("update", help="Update an application by id.")
+    p_update.add_argument("--id", type=int, required=True)
+    p_update.add_argument("--status", choices=["applied", "interview", "offer","rejected"])
+    p_update.add_argument("--notes")
+    p_update.set_defaults(func=cmd_update)
 
     return parser
 
