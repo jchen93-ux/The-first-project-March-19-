@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-import joblog.__main__ as app
-
+import joblog.commands as app
+import joblog.storage as storage
 
 def test_load_data_when_missing(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
