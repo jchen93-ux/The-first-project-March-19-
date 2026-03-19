@@ -120,3 +120,25 @@ def test_search_filters_by_company(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "Amazon" in out
     assert "Google" not in out
+
+
+def test_export_creates_csv(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    a1 = type("Args", (), {})()
+    a1.company = "Amazon"
+    a1.role = "SDE"
+    a1.status = "applied"
+    a1.date = "2026-03-19"
+    a1.notes = "n"
+    app.cmd_add(a1)
+
+    export_args = type("Args", (), {})()
+    export_args.out = "out.csv"
+
+    capsys.readouterr()
+    app.cmd_export(export_args)
+
+    out = capsys.readouterr().out
+    assert "Exported 1 applications" in out
+    assert (tmp_path / "out.csv").exists()

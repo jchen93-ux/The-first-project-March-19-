@@ -1,6 +1,6 @@
 import argparse
 from datetime import date
-
+from .commands import cmd_add, cmd_export, cmd_list, cmd_search, cmd_stats, cmd_update
 from .commands import cmd_add, cmd_list, cmd_search, cmd_stats, cmd_update
 
 
@@ -32,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_search.add_argument("--company")
     p_search.add_argument("--role")
     p_search.set_defaults(func=cmd_search)
+
+    p_export = sub.add_parser("export", help="Export applications to CSV.")
+    p_export.add_argument("--out", default="joblog.csv")
+    p_export.set_defaults(func=cmd_export)
+
+
 
     return parser
 

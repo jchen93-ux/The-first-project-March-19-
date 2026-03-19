@@ -1,7 +1,9 @@
 import argparse
+import csv
 from collections import Counter
-
 from .storage import load_data, save_data
+from pathlib import Path
+
 
 
 def cmd_add(args: argparse.Namespace) -> None:
@@ -18,6 +20,22 @@ def cmd_add(args: argparse.Namespace) -> None:
     data["next_id"] += 1
     save_data(data)
     print(f"Added application id={item['id']} ({item['company']} - {item['role']})")
+
+
+def cmd_export(args: argparse.Namespace) -> None:
+    data = load_data()
+    items = data["items"]
+
+    out_path = Path(args.out)
+
+    fieldnames = ["id", "company", "role", "status", "date", "notes"]
+    with out_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for it in items:
+            writer.writerow({k: it.get(k, "") for k in fieldnames})
+
+    print(f"Exported {len(items)} applications to {out_path}")
 
 
 def cmd_list(_: argparse.Namespace) -> None:
