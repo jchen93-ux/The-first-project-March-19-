@@ -65,3 +65,58 @@ def test_update_unknown_id_does_not_crash(tmp_path, monkeypatch, capsys):
 
     out = capsys.readouterr().out
     assert "not found" in out.lower()
+
+def test_stats_outputs_counts(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    a1 = type("Args", (), {})()
+    a1.company = "A"
+    a1.role = "R"
+    a1.status = "applied"
+    a1.date = "2026-03-19"
+    a1.notes = ""
+    app.cmd_add(a1)
+
+    a2 = type("Args", (), {})()
+    a2.company = "B"
+    a2.role = "R"
+    a2.status = "interview"
+    a2.date = "2026-03-19"
+    a2.notes = ""
+    app.cmd_add(a2)
+
+    app.cmd_stats(type("Args", (), {})())
+    out = capsys.readouterr().out.lower()
+    assert "total: 2" in out
+    assert "applied: 1" in out
+    assert "interview: 1" in out
+
+
+def test_search_filters_by_company(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+
+    a1 = type("Args", (), {})()
+    a1.company = "Amazon"
+    a1.role = "SDE"
+    a1.status = "applied"
+    a1.date = "2026-03-19"
+    a1.notes = ""
+    app.cmd_add(a1)
+
+    a2 = type("Args", (), {})()
+    a2.company = "Google"
+    a2.role = "SWE"
+    a2.status = "applied"
+    a2.date = "2026-03-19"
+    a2.notes = ""
+    app.cmd_add(a2)
+
+    args = type("Args", (), {})()
+    args.company = "ama"
+    args.role = None
+    capsys.readouterr()
+    app.cmd_search(args)
+
+    out = capsys.readouterr().out
+    assert "Amazon" in out
+    assert "Google" not in out
