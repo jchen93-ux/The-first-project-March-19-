@@ -6,3 +6,5 @@ __pycache__/
 .DS_Store
 joblog.json
 .idea/
+*.csv
+joblog.csv
